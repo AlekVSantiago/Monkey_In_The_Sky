@@ -6,13 +6,18 @@ enum ActionKind {
     runLeft,
     runRight
 }
+function checkGameOver () {
+    if (lifePoints <= 0) {
+        game.gameOver(false)
+    }
+}
 function handleAnimation () {
-    if (ShakeSpeare.vx < 0 && isGrounded) {
-        animation.setAction(ShakeSpeare, ActionKind.runLeft)
-    } else if (ShakeSpeare.vx > 0 && isGrounded) {
-        animation.setAction(ShakeSpeare, ActionKind.runRight)
-    } else if (ShakeSpeare.vx < 0 && !(isGrounded)) {
-        ShakeSpeare.setImage(img`
+    if (Shakespeare.vx < 0 && isGrounded) {
+        animation.setAction(Shakespeare, ActionKind.runLeft)
+    } else if (Shakespeare.vx > 0 && isGrounded) {
+        animation.setAction(Shakespeare, ActionKind.runRight)
+    } else if (Shakespeare.vx < 0 && !(isGrounded)) {
+        Shakespeare.setImage(img`
             . . . . f f f f f . . . . . . . 
             . . . f e e e e e f . . . . . . 
             . . f d d d d e e e f . . . . . 
@@ -30,8 +35,8 @@ function handleAnimation () {
             . . . . . . . . . f c d d f . . 
             . . . . . . . . . . f f f f . . 
             `)
-    } else if (ShakeSpeare.vx > 0 && !(isGrounded)) {
-        ShakeSpeare.setImage(img`
+    } else if (Shakespeare.vx > 0 && !(isGrounded)) {
+        Shakespeare.setImage(img`
             . . . . . . . f f f f f . . . . 
             . . . . . . f e e e e e f . . . 
             . . . . . f e e e d d d d f . . 
@@ -49,55 +54,301 @@ function handleAnimation () {
             . . f d d c f . . . . . . . . . 
             . . f f f f . . . . . . . . . . 
             `)
+    } else if (Shakespeare.vx == 0 && isGrounded) {
+        if (facingRight) {
+            Shakespeare.setImage(img`
+                . . . . . . . f f f f f . . . . 
+                . . . . . . f e e e e e f . . . 
+                . . . . . f e e e d d d d f . . 
+                . . . . f f e e d f d d f d c . 
+                . . . f d d e e d f d d f d c . 
+                . . . c d b e e d d d d e e d c 
+                . . . c d b e e d d c d d d d c 
+                . . . . c f e e e d d c c c c c 
+                . . . . . f f e e e d d d d f . 
+                . . . . f e e e e f f f f f . . 
+                f f . f e e e e e e f f . . . . 
+                f e . f e e f e e f e e f . . . 
+                f e . f e e e f e e f e e f . . 
+                f e f f e f b b f b d f d b f . 
+                f f f f e b d d f d d f d d f . 
+                . f f f f f f f f f f f f f . . 
+                `)
+            animation.stopAnimation(animation.AnimationTypes.All, Shakespeare)
+        } else {
+            Shakespeare.setImage(img`
+                . . . . f f f f f . . . . . . . 
+                . . . f e e e e e f . . . . . . 
+                . . f d d d d e e e f . . . . . 
+                . c d f d d f d e e f f . . . . 
+                . c d f d d f d e e d d f . . . 
+                c d e e d d d d e e b d c . . . 
+                c d d d d c d d e e b d c . . . 
+                c c c c c d d e e e f c . . . . 
+                . f d d d d e e e f f . . . . . 
+                . . f f f f f e e e e f . . . . 
+                . . . . f f e e e e e e f . f f 
+                . . . f e e f e e f e e f . e f 
+                . . f e e f e e f e e e f . e f 
+                . f b d f d b f b b f e f f e f 
+                . f d d f d d f d d b e f f f f 
+                . . f f f f f f f f f f f f f . 
+                `)
+            animation.stopAnimation(animation.AnimationTypes.All, Shakespeare)
+        }
+    } else if (Shakespeare.vx == 0 && !(isGrounded)) {
+        if (facingRight) {
+            Shakespeare.setImage(img`
+                . . . . . . . f f f f f . . . . 
+                . . . . . . f e e e e e f . . . 
+                . . . . . f e e e d d d d f . . 
+                . . . . . f e e d f d d f d c . 
+                . . . . f f e e d f d d f d c . 
+                . . . f d d e e d d d d e e d c 
+                . . . c d b e e d d c d d d d c 
+                f f . c d b e e e d d c c c c c 
+                f e f . c f f e e e d d d d f . 
+                f e f . f e e e e f f f f f f . 
+                f e f f e e e e e e e f f f f . 
+                . f f e e e e f e f d d f d d f 
+                . . f e e e e f e f b d f b d f 
+                . . f e f f f f f f f f f f f f 
+                . . f d d c f . . . . . . . . . 
+                . . f f f f . . . . . . . . . . 
+                `)
+            animation.stopAnimation(animation.AnimationTypes.All, Shakespeare)
+        } else {
+            Shakespeare.setImage(img`
+                . . . . f f f f f . . . . . . . 
+                . . . f e e e e e f . . . . . . 
+                . . f d d d d e e e f . . . . . 
+                . c d f d d f d e e f . . . . . 
+                . c d f d d f d e e f f . . . . 
+                c d e e d d d d e e d d f . . . 
+                c d d d d c d d e e b d c . . . 
+                c c c c c d d e e e b d c . f f 
+                . f d d d d e e e f f c . f e f 
+                . f f f f f f e e e e f . f e f 
+                . f f f f e e e e e e e f f e f 
+                f d d f d d f e f e e e e f f . 
+                f d b f d b f e f e e e e f . . 
+                f f f f f f f f f f f f e f . . 
+                . . . . . . . . . f c d d f . . 
+                . . . . . . . . . . f f f f . . 
+                `)
+            animation.stopAnimation(animation.AnimationTypes.All, Shakespeare)
+        }
     } else {
-        ShakeSpeare.setImage(img`
-            . . . . . . . f f f f f . . . . 
-            . . . . . . f e e e e e f . . . 
-            . . . . . f e e e d d d d f . . 
-            . . . . f f e e d f d d f d c . 
-            . . . f d d e e d f d d f d c . 
-            . . . c d b e e d d d d e e d c 
-            . . . c d b e e d d c d d d d c 
-            . . . . c f e e e d d c c c c c 
-            . . . . . f f e e e d d d d f . 
-            . . . . f e e e e f f f f f . . 
-            f f . f e e e e e e f f . . . . 
-            f e . f e e f e e f e e f . . . 
-            f e . f e e e f e e f e e f . . 
-            f e f f e f b b f b d f d b f . 
-            f f f f e b d d f d d f d d f . 
-            . f f f f f f f f f f f f f . . 
-            `)
-        animation.stopAnimation(animation.AnimationTypes.All, ShakeSpeare)
+        console.log("You missed something here in the Handle animation")
     }
 }
 function handleJump () {
     if (controller.A.isPressed()) {
         if (isGrounded) {
-            ShakeSpeare.vy = -100
+            Shakespeare.vy = -100
             jumpTimer = 0
-        } else if (jumpTimer < endTimer) {
-            ShakeSpeare.vy = -100
-            jumpTimer += 20
+        } else if (jumpTimer < jumpEndTimer) {
+            Shakespeare.vy = -100
+            jumpTimer += changeNumber
+            console.log(jumpTimer)
         }
     } else if (false) {
-        ShakeSpeare.setVelocity(0, 100)
+        Shakespeare.setVelocity(0, 100)
+    }
+}
+function checkDirection () {
+    if (Shakespeare.x > 0) {
+        facingRight = true
+    } else if (Shakespeare.x > 0) {
+        facingRight = false
+    } else {
+    	
+    }
+}
+function iFrames () {
+    if (damageTimer < damageEndTimer) {
+        isInvincible = true
+        damageTimer += changeNumber
+    } else {
+        isInvincible = false
     }
 }
 function checkGrounded () {
-    if (ShakeSpeare.isHittingTile(CollisionDirection.Bottom)) {
+    if (Shakespeare.isHittingTile(CollisionDirection.Bottom)) {
         isGrounded = true
     } else {
         isGrounded = false
     }
 }
-let ShakeSpeare: Sprite = null
-let isGrounded = false
+function initShakespeare () {
+    Shakespeare = sprites.create(img`
+        . . . . . . . f f f f f . . . . 
+        . . . . . . f e e e e e f . . . 
+        . . . . . f e e e d d d d f . . 
+        . . . . f f e e d f d d f d c . 
+        . . . f d d e e d f d d f d c . 
+        . . . c d b e e d d d d e e d c 
+        f f . c d b e e d d c d d d d c 
+        f e f . c f e e d d d c c c c c 
+        f e f . . f f e e d d d d d f . 
+        f e f . f e e e e f f f f f . . 
+        f e f f e e e e e e e f . . . . 
+        . f f e e e e f e f f e f . . . 
+        . . f e e e e f e f f e f . . . 
+        . . . f e f f b d f b d f . . . 
+        . . . f d b b d d c d d f . . . 
+        . . . f f f f f f f f f . . . . 
+        `, SpriteKind.Player)
+    Shakespeare.ay = 350
+    controller.moveSprite(Shakespeare, speedForce, 0)
+    runLeft = animation.createAnimation(ActionKind.runLeft, 90)
+    runLeft.addAnimationFrame(img`
+        . . . . f f f f f . . . . . . . 
+        . . . f e e e e e f . . . . . . 
+        . . f d d d d e e e f . . . . . 
+        . c d f d d f d e e f . . . . . 
+        . c d f d d f d e e f f . . . . 
+        c d e e d d d d e e d d f . . . 
+        c d d d d c d d e e b d c . . . 
+        c c c c c d d e e e b d c . f f 
+        . f d d d d e e e f f c . f e f 
+        . f f f f f f e e e e f . f e f 
+        . f f f f e e e e e e e f f e f 
+        f d d f d d f e f e e e e f f . 
+        f d b f d b f e f e e e e f . . 
+        f f f f f f f f f f f f e f . . 
+        . . . . . . . . . f c d d f . . 
+        . . . . . . . . . . f f f f . . 
+        `)
+    runLeft.addAnimationFrame(img`
+        . . . . f f f f f . . . . . . . 
+        . . . f e e e e e f . . . . . . 
+        . . f d d d d e e e f f . . . . 
+        . c d d d d d d e e d d f . . . 
+        . c d f d d f d e e b d c . . . 
+        c d d f d d f d e e b d c . f f 
+        c d e e d d d d e e f c . f e f 
+        c d d d d c d e e e f . . f e f 
+        . f c c c d e e e f f . . f e f 
+        . . f f f f f e e e e f . f e f 
+        . . . . f e e e e e e e f f f . 
+        . . f f e f e e f e e e e f . . 
+        . f e f f e e f f f e e e f . . 
+        f d d b d d c f f f f f f b f . 
+        f d d c d d d f . . f c d d f . 
+        . f f f f f f f . . . f f f . . 
+        `)
+    runLeft.addAnimationFrame(img`
+        . . . . f f f f f . . . . . . . 
+        . . . f e e e e e f f f . . . . 
+        . . f d d d e e e e d d f . . . 
+        . c d d d d d e e e b d c . . . 
+        . c d d d d d d e e b d c . . . 
+        c d d f d d f d e e f c . f f . 
+        c d d f d d f d e e f . . f e f 
+        c d e e d d d d e e f . . f e f 
+        . f d d d c d e e f f . . f e f 
+        . . f f f d e e e e e f . f e f 
+        . . . . f e e e e e e e f f f . 
+        . . . . f f e e e e e b f f . . 
+        . . . f e f f e e c d d f f . . 
+        . . f d d b d d c f f f . . . . 
+        . . f d d c d d d f f . . . . . 
+        . . . f f f f f f f . . . . . . 
+        `)
+    animation.attachAnimation(Shakespeare, runLeft)
+    runRight = animation.createAnimation(ActionKind.runRight, 90)
+    runRight.addAnimationFrame(img`
+        . . . . . . . f f f f f . . . . 
+        . . . . . . f e e e e e f . . . 
+        . . . . . f e e e d d d d f . . 
+        . . . . . f e e d f d d f d c . 
+        . . . . f f e e d f d d f d c . 
+        . . . f d d e e d d d d e e d c 
+        . . . c d b e e d d c d d d d c 
+        f f . c d b e e e d d c c c c c 
+        f e f . c f f e e e d d d d f . 
+        f e f . f e e e e f f f f f f . 
+        f e f f e e e e e e e f f f f . 
+        . f f e e e e f e f d d f d d f 
+        . . f e e e e f e f b d f b d f 
+        . . f e f f f f f f f f f f f f 
+        . . f d d c f . . . . . . . . . 
+        . . f f f f . . . . . . . . . . 
+        `)
+    runRight.addAnimationFrame(img`
+        . . . . . . . f f f f f . . . . 
+        . . . . . . f e e e e e f . . . 
+        . . . . f f e e e d d d d f . . 
+        . . . f d d e e d d d d d d c . 
+        . . . c d b e e d f d d f d c . 
+        f f . c d b e e d f d d f d d c 
+        f e f . c f e e d d d d e e d c 
+        f e f . . f e e e d c d d d d c 
+        f e f . . f f e e e d c c c f . 
+        f e f . f e e e e f f f f f . . 
+        . f f f e e e e e e e f . . . . 
+        . . f e e e e f e e f e f f . . 
+        . . f e e e f f f e e f f e f . 
+        . f b f f f f f f c d d b d d f 
+        . f d d c f . . f d d d c d d f 
+        . . f f f . . . f f f f f f f . 
+        `)
+    runRight.addAnimationFrame(img`
+        . . . . . . . f f f f f . . . . 
+        . . . . f f f e e e e e f . . . 
+        . . . f d d e e e e d d d f . . 
+        . . . c d b e e e d d d d d c . 
+        . . . c d b e e d d d d d d c . 
+        . f f . c f e e d f d d f d d c 
+        f e f . . f e e d f d d f d d c 
+        f e f . . f e e d d d d e e d c 
+        f e f . . f f e e d c d d d f . 
+        f e f . f e e e e e d f f f . . 
+        . f f f e e e e e e e f . . . . 
+        . . f f b e e e e e f f . . . . 
+        . . f f d d c e e f f e f . . . 
+        . . . . f f f c d d b d d f . . 
+        . . . . . f f d d d c d d f . . 
+        . . . . . . f f f f f f f . . . 
+        `)
+    animation.attachAnimation(Shakespeare, runRight)
+}
+function initVariables () {
+    facingRight = true
+    damageEndTimer = 1000
+    lifePoints = 5
+    jumpEndTimer = 300
+    changeNumber = 20
+    jumpTimer = 0
+    damageTimer = 500
+    isInvincible = false
+    isGrounded = false
+    jumpTimer = 0
+    speedForce = 80
+}
+sprites.onOverlap(SpriteKind.Player, SpriteKind.Enemy, function (sprite, otherSprite) {
+    if (!(isInvincible)) {
+        lifePoints += -1
+        damageTimer = 0
+        Shakespeare.vx = -600
+    } else {
+        console.log("No Damage: " + lifePoints)
+    }
+})
+let runRight: animation.Animation = null
+let runLeft: animation.Animation = null
+let speedForce = 0
+let isInvincible = false
+let damageEndTimer = 0
+let damageTimer = 0
+let changeNumber = 0
+let jumpEndTimer = 0
 let jumpTimer = 0
-let endTimer = 0
-endTimer = 500
-let changeTimer = 100
-jumpTimer = 0
+let facingRight = false
+let isGrounded = false
+let lifePoints = 0
+let Shakespeare: Sprite = null
 scene.setBackgroundImage(img`
     9999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999
     9999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999
@@ -221,154 +472,23 @@ scene.setBackgroundImage(img`
     9999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999
     `)
 game.splash("Monkey In The Sky")
-isGrounded = false
-jumpTimer = 0
-let Speed = 10
-ShakeSpeare = sprites.create(img`
-    . . . . . . . f f f f f . . . . 
-    . . . . . . f e e e e e f . . . 
-    . . . . . f e e e d d d d f . . 
-    . . . . f f e e d f d d f d c . 
-    . . . f d d e e d f d d f d c . 
-    . . . c d b e e d d d d e e d c 
-    f f . c d b e e d d c d d d d c 
-    f e f . c f e e d d d c c c c c 
-    f e f . . f f e e d d d d d f . 
-    f e f . f e e e e f f f f f . . 
-    f e f f e e e e e e e f . . . . 
-    . f f e e e e f e f f e f . . . 
-    . . f e e e e f e f f e f . . . 
-    . . . f e f f b d f b d f . . . 
-    . . . f d b b d d c d d f . . . 
-    . . . f f f f f f f f f . . . . 
-    `, SpriteKind.Player)
-ShakeSpeare.ay = 350
-controller.moveSprite(ShakeSpeare, 80, 0)
-let runLeft = animation.createAnimation(ActionKind.runLeft, 100)
-runLeft.addAnimationFrame(img`
-    . . . . f f f f f . . . . . . . 
-    . . . f e e e e e f . . . . . . 
-    . . f d d d d e e e f . . . . . 
-    . c d f d d f d e e f . . . . . 
-    . c d f d d f d e e f f . . . . 
-    c d e e d d d d e e d d f . . . 
-    c d d d d c d d e e b d c . . . 
-    c c c c c d d e e e b d c . f f 
-    . f d d d d e e e f f c . f e f 
-    . f f f f f f e e e e f . f e f 
-    . f f f f e e e e e e e f f e f 
-    f d d f d d f e f e e e e f f . 
-    f d b f d b f e f e e e e f . . 
-    f f f f f f f f f f f f e f . . 
-    . . . . . . . . . f c d d f . . 
-    . . . . . . . . . . f f f f . . 
-    `)
-runLeft.addAnimationFrame(img`
-    . . . . f f f f f . . . . . . . 
-    . . . f e e e e e f . . . . . . 
-    . . f d d d d e e e f f . . . . 
-    . c d d d d d d e e d d f . . . 
-    . c d f d d f d e e b d c . . . 
-    c d d f d d f d e e b d c . f f 
-    c d e e d d d d e e f c . f e f 
-    c d d d d c d e e e f . . f e f 
-    . f c c c d e e e f f . . f e f 
-    . . f f f f f e e e e f . f e f 
-    . . . . f e e e e e e e f f f . 
-    . . f f e f e e f e e e e f . . 
-    . f e f f e e f f f e e e f . . 
-    f d d b d d c f f f f f f b f . 
-    f d d c d d d f . . f c d d f . 
-    . f f f f f f f . . . f f f . . 
-    `)
-runLeft.addAnimationFrame(img`
-    . . . . f f f f f . . . . . . . 
-    . . . f e e e e e f f f . . . . 
-    . . f d d d e e e e d d f . . . 
-    . c d d d d d e e e b d c . . . 
-    . c d d d d d d e e b d c . . . 
-    c d d f d d f d e e f c . f f . 
-    c d d f d d f d e e f . . f e f 
-    c d e e d d d d e e f . . f e f 
-    . f d d d c d e e f f . . f e f 
-    . . f f f d e e e e e f . f e f 
-    . . . . f e e e e e e e f f f . 
-    . . . . f f e e e e e b f f . . 
-    . . . f e f f e e c d d f f . . 
-    . . f d d b d d c f f f . . . . 
-    . . f d d c d d d f f . . . . . 
-    . . . f f f f f f f . . . . . . 
-    `)
-animation.attachAnimation(ShakeSpeare, runLeft)
-let runRight = animation.createAnimation(ActionKind.runRight, 100)
-runRight.addAnimationFrame(img`
-    . . . . . . . f f f f f . . . . 
-    . . . . . . f e e e e e f . . . 
-    . . . . . f e e e d d d d f . . 
-    . . . . . f e e d f d d f d c . 
-    . . . . f f e e d f d d f d c . 
-    . . . f d d e e d d d d e e d c 
-    . . . c d b e e d d c d d d d c 
-    f f . c d b e e e d d c c c c c 
-    f e f . c f f e e e d d d d f . 
-    f e f . f e e e e f f f f f f . 
-    f e f f e e e e e e e f f f f . 
-    . f f e e e e f e f d d f d d f 
-    . . f e e e e f e f b d f b d f 
-    . . f e f f f f f f f f f f f f 
-    . . f d d c f . . . . . . . . . 
-    . . f f f f . . . . . . . . . . 
-    `)
-runRight.addAnimationFrame(img`
-    . . . . . . . f f f f f . . . . 
-    . . . . . . f e e e e e f . . . 
-    . . . . f f e e e d d d d f . . 
-    . . . f d d e e d d d d d d c . 
-    . . . c d b e e d f d d f d c . 
-    f f . c d b e e d f d d f d d c 
-    f e f . c f e e d d d d e e d c 
-    f e f . . f e e e d c d d d d c 
-    f e f . . f f e e e d c c c f . 
-    f e f . f e e e e f f f f f . . 
-    . f f f e e e e e e e f . . . . 
-    . . f e e e e f e e f e f f . . 
-    . . f e e e f f f e e f f e f . 
-    . f b f f f f f f c d d b d d f 
-    . f d d c f . . f d d d c d d f 
-    . . f f f . . . f f f f f f f . 
-    `)
-runRight.addAnimationFrame(img`
-    . . . . . . . f f f f f . . . . 
-    . . . . f f f e e e e e f . . . 
-    . . . f d d e e e e d d d f . . 
-    . . . c d b e e e d d d d d c . 
-    . . . c d b e e d d d d d d c . 
-    . f f . c f e e d f d d f d d c 
-    f e f . . f e e d f d d f d d c 
-    f e f . . f e e d d d d e e d c 
-    f e f . . f f e e d c d d d f . 
-    f e f . f e e e e e d f f f . . 
-    . f f f e e e e e e e f . . . . 
-    . . f f b e e e e e f f . . . . 
-    . . f f d d c e e f f e f . . . 
-    . . . . f f f c d d b d d f . . 
-    . . . . . f f d d d c d d f . . 
-    . . . . . . f f f f f f f . . . 
-    `)
-animation.attachAnimation(ShakeSpeare, runRight)
-scene.cameraFollowSprite(ShakeSpeare)
+initVariables()
+initShakespeare()
+scene.cameraFollowSprite(Shakespeare)
 tiles.setCurrentTilemap(tilemap`level2`)
 game.onUpdate(function () {
+    checkDirection()
     checkGrounded()
     handleJump()
     handleAnimation()
+    iFrames()
+    checkGameOver()
 })
 game.onUpdateInterval(5000, function () {
     console.log("Grounded: " + isGrounded)
-    console.log("x velocity:  " + ShakeSpeare.vx)
-})
-game.onUpdateInterval(changeTimer, function () {
-    if (jumpTimer < endTimer) {
-        jumpTimer += changeTimer
-    }
+    console.log("x velocity:  " + Shakespeare.vx)
+    console.log(Shakespeare.x)
+    console.log("Life Points: " + lifePoints)
+    console.log(isInvincible)
+    console.log(facingRight)
 })

@@ -7,8 +7,10 @@ enum ActionKind {
     runRight
 }
 function checkGameOver () {
-    if (lifePoints <= 0) {
-        game.gameOver(false)
+    if (Shakespeare.y >= 300) {
+        game.reset()
+    } else if (Shakespeare.x >= 3940) {
+        game.gameOver(true)
     }
 }
 function handleAnimation () {
@@ -75,7 +77,7 @@ function handleAnimation () {
                 . f f f f f f f f f f f f f . . 
                 `)
             animation.stopAnimation(animation.AnimationTypes.All, Shakespeare)
-        } else {
+        } else if (!(facingRight)) {
             Shakespeare.setImage(img`
                 . . . . f f f f f . . . . . . . 
                 . . . f e e e e e f . . . . . . 
@@ -157,20 +159,10 @@ function handleJump () {
     }
 }
 function checkDirection () {
-    if (Shakespeare.x > 0) {
+    if (Shakespeare.vx > 0) {
         facingRight = true
-    } else if (Shakespeare.x > 0) {
+    } else if (Shakespeare.vx < 0) {
         facingRight = false
-    } else {
-    	
-    }
-}
-function iFrames () {
-    if (damageTimer < damageEndTimer) {
-        isInvincible = true
-        damageTimer += changeNumber
-    } else {
-        isInvincible = false
     }
 }
 function checkGrounded () {
@@ -180,6 +172,9 @@ function checkGrounded () {
         isGrounded = false
     }
 }
+sprites.onOverlap(SpriteKind.Player, SpriteKind.Player, function (sprite, otherSprite) {
+	
+})
 function initShakespeare () {
     Shakespeare = sprites.create(img`
         . . . . . . . f f f f f . . . . 
@@ -199,6 +194,7 @@ function initShakespeare () {
         . . . f d b b d d c d d f . . . 
         . . . f f f f f f f f f . . . . 
         `, SpriteKind.Player)
+    Shakespeare.setPosition(14, 180)
     Shakespeare.ay = 350
     controller.moveSprite(Shakespeare, speedForce, 0)
     runLeft = animation.createAnimation(ActionKind.runLeft, 90)
@@ -314,6 +310,9 @@ function initShakespeare () {
         `)
     animation.attachAnimation(Shakespeare, runRight)
 }
+sprites.onOverlap(SpriteKind.Player, SpriteKind.Food, function (sprite, otherSprite) {
+    game.gameOver(true)
+})
 function initVariables () {
     facingRight = true
     damageEndTimer = 1000
@@ -336,18 +335,18 @@ sprites.onOverlap(SpriteKind.Player, SpriteKind.Enemy, function (sprite, otherSp
         console.log("No Damage: " + lifePoints)
     }
 })
+let isInvincible = false
+let damageTimer = 0
+let lifePoints = 0
+let damageEndTimer = 0
 let runRight: animation.Animation = null
 let runLeft: animation.Animation = null
 let speedForce = 0
-let isInvincible = false
-let damageEndTimer = 0
-let damageTimer = 0
 let changeNumber = 0
 let jumpEndTimer = 0
 let jumpTimer = 0
 let facingRight = false
 let isGrounded = false
-let lifePoints = 0
 let Shakespeare: Sprite = null
 scene.setBackgroundImage(img`
     9999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999
@@ -472,16 +471,15 @@ scene.setBackgroundImage(img`
     9999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999
     `)
 game.splash("Monkey In The Sky")
+tiles.setCurrentTilemap(tilemap`level2`)
 initVariables()
 initShakespeare()
 scene.cameraFollowSprite(Shakespeare)
-tiles.setCurrentTilemap(tilemap`level2`)
 game.onUpdate(function () {
     checkDirection()
     checkGrounded()
     handleJump()
     handleAnimation()
-    iFrames()
     checkGameOver()
 })
 game.onUpdateInterval(5000, function () {

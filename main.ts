@@ -7,9 +7,9 @@ enum ActionKind {
     runRight
 }
 function checkGameOver () {
-    if (Shakespeare.y >= 300) {
-        game.reset()
-    } else if (Shakespeare.x >= 3940) {
+    if (Shakespeare.y >= 550) {
+        Shakespeare.setPosition(15, 15)
+    } else if (Shakespeare.x >= 3940 && Shakespeare.y <= 425) {
         game.gameOver(true)
     }
 }
@@ -147,15 +147,31 @@ function handleAnimation () {
 function handleJump () {
     if (controller.A.isPressed()) {
         if (isGrounded) {
-            Shakespeare.vy = -100
+            Shakespeare.vy = -90
             jumpTimer = 0
         } else if (jumpTimer < jumpEndTimer) {
-            Shakespeare.vy = -100
+            Shakespeare.vy = -90
+            // Shakespeare.vy = -100
             jumpTimer += changeNumber
-            console.log(jumpTimer)
         }
-    } else if (false) {
-        Shakespeare.setVelocity(0, 100)
+    } else if (!(controller.A.isPressed())) {
+        jumpTimer = jumpEndTimer
+    }
+}
+function handleDebug () {
+    // console.log("x velocity:  " + Math.trunc(Shakespeare.vx))
+    // console.log("y velocity: " + Math.trunc(Shakespeare.vy))
+    if (controller.A.isPressed() && controller.up.isPressed()) {
+        console.log("Everything is working :) ")
+        console.log("X Position: " + Math.trunc(Shakespeare.x))
+        console.log("Y Position: " + Math.trunc(Shakespeare.y))
+        console.log("Grounded: " + isGrounded)
+        console.log("Start X Position: " + convertToText(start[0]) + ("    Start Y Position: " + convertToText(start[1])))
+        if (facingRight) {
+            console.log("Facing Right")
+        } else if (!(facingRight)) {
+            console.log("Facing left")
+        }
     }
 }
 function checkDirection () {
@@ -172,9 +188,9 @@ function checkGrounded () {
         isGrounded = false
     }
 }
-sprites.onOverlap(SpriteKind.Player, SpriteKind.Player, function (sprite, otherSprite) {
+function spawn (array: any[]) {
 	
-})
+}
 function initShakespeare () {
     Shakespeare = sprites.create(img`
         . . . . . . . f f f f f . . . . 
@@ -194,7 +210,7 @@ function initShakespeare () {
         . . . f d b b d d c d d f . . . 
         . . . f f f f f f f f f . . . . 
         `, SpriteKind.Player)
-    Shakespeare.setPosition(14, 180)
+    Shakespeare.setPosition(upCheckpoint2Special[0], upCheckpoint2Special[1])
     Shakespeare.ay = 350
     controller.moveSprite(Shakespeare, speedForce, 0)
     runLeft = animation.createAnimation(ActionKind.runLeft, 90)
@@ -310,13 +326,29 @@ function initShakespeare () {
         `)
     animation.attachAnimation(Shakespeare, runRight)
 }
-sprites.onOverlap(SpriteKind.Player, SpriteKind.Food, function (sprite, otherSprite) {
-    game.gameOver(true)
-})
+function buildCheckpoints () {
+    start = [35, 424]
+    downCheckpoint1 = [1255, 381]
+    downCheckpoint2 = [2498, 318]
+    upCheckpoint1 = [716, 275]
+    upCheckpoint2 = [1935, 209]
+    upCheckpoint2Special = [1903, 287]
+    upCheckpoint3 = [2242, 257]
+    checkpoints = [
+    start,
+    downCheckpoint1,
+    downCheckpoint2,
+    upCheckpoint1,
+    upCheckpoint2,
+    upCheckpoint2Special,
+    upCheckpoint3
+    ]
+}
 function initVariables () {
+    buildCheckpoints()
+    debugMode = false
     facingRight = true
     damageEndTimer = 1000
-    lifePoints = 5
     jumpEndTimer = 300
     changeNumber = 20
     jumpTimer = 0
@@ -326,27 +358,26 @@ function initVariables () {
     jumpTimer = 0
     speedForce = 80
 }
-sprites.onOverlap(SpriteKind.Player, SpriteKind.Enemy, function (sprite, otherSprite) {
-    if (!(isInvincible)) {
-        lifePoints += -1
-        damageTimer = 0
-        Shakespeare.vx = -600
-    } else {
-        console.log("No Damage: " + lifePoints)
-    }
-})
 let isInvincible = false
 let damageTimer = 0
-let lifePoints = 0
 let damageEndTimer = 0
+let checkpoints: number[][] = []
+let upCheckpoint3: number[] = []
+let upCheckpoint2: number[] = []
+let upCheckpoint1: number[] = []
+let downCheckpoint2: number[] = []
+let downCheckpoint1: number[] = []
 let runRight: animation.Animation = null
 let runLeft: animation.Animation = null
 let speedForce = 0
+let upCheckpoint2Special: number[] = []
+let start: number[] = []
 let changeNumber = 0
 let jumpEndTimer = 0
 let jumpTimer = 0
 let facingRight = false
 let isGrounded = false
+let debugMode = false
 let Shakespeare: Sprite = null
 scene.setBackgroundImage(img`
     9999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999
@@ -475,18 +506,14 @@ tiles.setCurrentTilemap(tilemap`level2`)
 initVariables()
 initShakespeare()
 scene.cameraFollowSprite(Shakespeare)
+if (debugMode) {
+    Shakespeare.setPosition(game.askForNumber("X Position"), game.askForNumber("Y Position"))
+}
 game.onUpdate(function () {
     checkDirection()
     checkGrounded()
     handleJump()
     handleAnimation()
     checkGameOver()
-})
-game.onUpdateInterval(5000, function () {
-    console.log("Grounded: " + isGrounded)
-    console.log("x velocity:  " + Shakespeare.vx)
-    console.log(Shakespeare.x)
-    console.log("Life Points: " + lifePoints)
-    console.log(isInvincible)
-    console.log(facingRight)
+    handleDebug()
 })
